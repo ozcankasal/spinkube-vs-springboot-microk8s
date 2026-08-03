@@ -5,6 +5,7 @@ spin.sig
 # Logs and Output
 *.log
 *_results.txt
+MEDIUM_BLOG_POST.md
 
 # Rust / Cargo
 spin-app/target/
