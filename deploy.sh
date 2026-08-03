@@ -34,6 +34,13 @@ cd springboot-app
 ./mvnw compile jib:build
 cd ..
 
+echo "Ensuring Rust and wasm32-wasip2 target are installed for Spin app build..."
+if ! command -v cargo &> /dev/null; then
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+fi
+source "$HOME/.cargo/env"
+rustup target add wasm32-wasip2
+
 echo "Building and Pushing Spin App..."
 cd spin-app
 # Spin requires passing the insecure flag for localhost registry
