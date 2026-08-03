@@ -24,6 +24,7 @@ sudo microk8s kubectl label node --all spin=true --overwrite
 
 echo "Installing Spin Operator..."
 sudo microk8s kubectl apply -f https://github.com/spinframework/spin-operator/releases/download/v0.6.1/spin-operator.runtime-class.yaml
+sudo microk8s kubectl apply -f https://github.com/spinframework/spin-operator/releases/download/v0.6.1/spin-operator.shim-executor.yaml
 sudo microk8s helm3 upgrade --install spin-operator --namespace spin-operator --create-namespace --version 0.6.1 oci://ghcr.io/spinframework/charts/spin-operator
 sudo microk8s kubectl wait --for=condition=Available deployment/spin-operator-controller-manager -n spin-operator --timeout=90s || true
 
