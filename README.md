@@ -72,8 +72,8 @@ Sistemdeki uygulamalara eşzamanlı yük bindirmek ve metrikleri arka planda yak
 ### 3. Genel Değerlendirme ve Ölçeklenme Kazancı
 Eğer sisteminizde yoğun matematiksel hesaplamalar yapılıyorsa JIT destekli diller (Java) avantajlıdır. Ancak bulut ortamlarında, WebAssembly (Spin) **"mikro saniyede ölçeklenme" (Scale to Zero / Scale to 10.000)** ve bunu yaparken faturanızı 10'da 1'ine düşürecek mikroskobik bellek tüketimi vaat eder.
 
-1.000 Pod'luk bir Kubernetes yatay ölçeklenmesinde (HPA):
-- **Spring Boot:** ~130 GB RAM maliyeti ve pod başına 3-5 saniyelik Cold Start.
-- **Spin (WASM):** Sadece ~1 GB RAM maliyeti ve anlık (milisaniyelik) tepki süresi.
+1.000 Pod'luk bir Kubernetes yatay ölçeklenmesinde (HPA) maksimum yük altında:
+- **Spring Boot:** ~261 GB RAM maliyeti (Pod başı 261 MB) ve yeni podların açılmasında 3-5 saniyelik Cold Start.
+- **Spin (WASM):** ~87 GB RAM maliyeti (Pod başı 87 MB) ve anlık (milisaniyelik) tepki süresi.
 
 SpinKube ve WebAssembly ikilisi, Event-Driven (olay güdümlü) çalışan ve Serverless (Sunucusuz) mimarilerde koşan modern mikroservisler için endüstri standardı olma yolunda ilerlemektedir.
