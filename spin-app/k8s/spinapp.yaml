@@ -14,7 +14,7 @@ metadata:
 spec:
   type: ClusterIP
   selector:
-    app: spin-app
+    app.kubernetes.io/name: spin-app
   ports:
   - port: 80
     targetPort: 80
