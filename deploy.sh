@@ -26,6 +26,9 @@ sudo microk8s kubectl apply -f https://github.com/spinframework/spin-operator/re
 sudo microk8s helm3 upgrade --install spin-operator --namespace spin-operator --create-namespace --version 0.6.1 oci://ghcr.io/spinframework/charts/spin-operator
 sudo microk8s kubectl wait --for=condition=Available deployment/spin-operator-controller-manager -n spin-operator --timeout=90s || true
 
+echo "Ensuring Java 21 is installed for Maven build..."
+sudo apt-get update && sudo apt-get install -y openjdk-21-jdk-headless
+
 echo "Building and Pushing Spring Boot App using Jib..."
 cd springboot-app
 ./mvnw compile jib:build
