@@ -13,7 +13,7 @@ echo "Enabling Helm3 in MicroK8s..."
 sudo microk8s enable helm3
 
 echo "Installing Spin Operator CRDs..."
-sudo microk8s kubectl apply -f https://github.com/spinframework/spin-operator/releases/download/v0.3.0/spin-operator.crds.yaml
+sudo microk8s kubectl apply -f https://github.com/spinframework/spin-operator/releases/download/v0.6.1/spin-operator.crds.yaml
 
 echo "Installing Runtime Class Manager..."
 sudo microk8s helm3 upgrade --install runtime-class-manager --namespace runtime-class-manager --create-namespace --version 0.2.0 oci://ghcr.io/spinframework/charts/runtime-class-manager
@@ -22,9 +22,9 @@ echo "Configuring containerd-shim-spin for Runtime Class Manager..."
 sudo microk8s kubectl apply -f https://github.com/spinframework/containerd-shim-spin/releases/download/v0.25.1/runtime-class-manager-shim-v1alpha1-v0.25.1.yaml
 
 echo "Installing Spin Operator..."
-sudo microk8s kubectl apply -f https://github.com/spinframework/spin-operator/releases/download/v0.3.0/spin-operator.runtime-class.yaml
-sudo microk8s kubectl apply -f https://github.com/spinframework/spin-operator/releases/download/v0.3.0/spin-operator.yaml
-sudo microk8s kubectl wait --for=condition=Available deployment/spin-operator-controller-manager -n spin-operator-system --timeout=90s || true
+sudo microk8s kubectl apply -f https://github.com/spinframework/spin-operator/releases/download/v0.6.1/spin-operator.runtime-class.yaml
+sudo microk8s helm3 upgrade --install spin-operator --namespace spin-operator --create-namespace --version 0.6.1 oci://ghcr.io/spinframework/charts/spin-operator
+sudo microk8s kubectl wait --for=condition=Available deployment/spin-operator-controller-manager -n spin-operator --timeout=90s || true
 
 echo "Building and Pushing Spring Boot App using Jib..."
 cd springboot-app
