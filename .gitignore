@@ -1,0 +1,21 @@
+# Binaries
+spin
+spin.sig
+
+# Logs and Output
+*.log
+*_results.txt
+
+# Rust / Cargo
+spin-app/target/
+spin-app/Cargo.lock
+
+# Java / Spring Boot
+springboot-app/target/
+springboot-app/.mvn/wrapper/maven-wrapper.jar
+
+# IDEs and OS
+.idea/
+.vscode/
+*.swp
+.DS_Store
