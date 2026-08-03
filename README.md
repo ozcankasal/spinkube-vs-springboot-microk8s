@@ -27,14 +27,24 @@ After deployment, you can observe the following differences:
 - **Spring Boot:** Typically 100-200MB depending on the JRE base image.
 - **Spin (WASM):** Typically a few megabytes (~2-5MB) as it only contains the compiled Wasm module.
 
-### 2. Startup Time
-- **Spring Boot:** Usually takes a few seconds (1-5s) to start the JVM and Spring Application Context.
-- **Spin (WASM):** Starts in sub-milliseconds because it doesn't run a long-lived server; the Wasmtime runtime spins up per-request or stays warm with negligible overhead.
+## Karşılaştırma Sonuçları ve Analiz
 
-### 3. Resource Usage (Idle)
-Run `sudo microk8s kubectl top pods` to see memory footprint.
-- **Spring Boot:** Expect it to reserve 100-300MB of RAM just sitting idle.
-- **Spin (WASM):** The SpinApp Pod running `containerd-shim-spin` will consume practically no idle resources compared to a JVM.
+Yapılan 10.000 istekli (`concurrency: 100`) yoğun yük testi (`ab`) sonuçlarına göre elde edilen veriler şunlardır:
+
+### 1. Performans (Hız)
+- **Spring Boot:** ~28 İstek/Saniye (Toplam süre: 352 saniye)
+- **Spin (WASM):** ~18 İstek/Saniye (Toplam süre: 529 saniye)
+
+*Analiz:* Yoğun CPU gerektiren (saf matematiksel hesaplama olan Fibonacci) sentetik testte Spring Boot'un (Java) daha hızlı çalıştığı görülmüştür. Bunun temel sebebi, Java'nın çalışma zamanında (Runtime) devreye giren JIT (Just-In-Time) derleyicisinin, sürekli tekrarlayan matematiksel döngüleri çok agresif bir şekilde optimize edebilmesidir. WebAssembly (Wasmtime) motoru henüz JIT seviyesinde bir optimizasyon sunmadığı için saf işlemci gücü gerektiren bu spesifik görevde geride kalmıştır.
+
+### 2. Kaynak Tüketimi (CPU ve RAM)
+- **Spring Boot:** Pik CPU: `3158m` (3.1 Core) | Pik RAM: `261Mi` (Boşta: ~130Mi)
+- **Spin (WASM):** Pik CPU: `3129m` (3.1 Core) | Pik RAM: `87Mi` (Boşta: ~0Mi)
+
+*Analiz:* Spin (WebAssembly) mimarisinin asıl parladığı nokta kaynak tüketimi olmuştur. Spring Boot boşta bile 130 MB civarı bellek tüketirken, Spin boştayken ölçülemeyecek kadar az (neredeyse sıfır) kaynak tüketmektedir. En ağır yük altında bile Spin uygulaması sadece **87 MB** belleğe ihtiyaç duyarken, Spring Boot **261 MB** belleğe kadar çıkmıştır. 
+
+### 3. Genel Değerlendirme
+SpinKube ve WebAssembly, özellikle çok sayıda mikroservisin veya "Serverless" fonksiyonun bir arada çalıştığı ve **bellek maliyetlerinin (RAM)** çok kritik olduğu bulut ortamları için devasa bir tasarruf potansiyeli sunmaktadır. Uygulamalar milisaniyeler içinde uyanıp (Cold start problemi olmadan) işlerini minimum RAM ile halledebilirler. Ancak sadece saf işlemci gücü gerektiren çok yoğun matematiksel hesaplamalarda geleneksel JIT derlemeli diller (Java, C# vb.) şu an için bir miktar performans avantajına sahiptir.
 
 ### 4. Development Experience
 - **Spring Boot:** Feature-rich ecosystem, easy to test, standard Dockerfile pipeline.
