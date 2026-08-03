@@ -4,6 +4,8 @@ Mikroservisler ve Kubernetes (K8s) dünyası yıllardır aynı standart üzerine
 
 Peki ya size uygulamanızın sıfır saniyede ayağa kalkıp, boştayken **hiçbir sistem kaynağı tüketmeyeceği**, ancak 10.000 istek geldiğinde saniyeler içinde binlerce kopyaya ulaşıp işi bitirebileceği bir gelecekten bahsetsem? 
 
+*(Not: Bu makaledeki tüm kodlara, kurulum detaylarına ve yük testi scriptlerine [GitHub repomuzdan ulaşabilirsiniz: ozcankasal/spinkube-vs-springboot-microk8s](https://github.com/ozcankasal/spinkube-vs-springboot-microk8s))*
+
 İşte bu yazıda, geleneksel kurumsal dünyanın kralı **Java (Spring Boot)** ile geleceğin parlayan yıldızı **WebAssembly (SpinKube / Rust)** mimarilerini yerel bir **MicroK8s** cluster'ında ringe çıkartıyoruz.
 
 Amacımız basit: Saf matematiksel yük altında hangisi daha hızlı? Ve daha da önemlisi, hangisi sunucu faturanızı kurtaracak?
@@ -52,7 +54,9 @@ Her iki uygulamayı da Apache Bench (`ab`) ile 100 eşzamanlı bağlantı (concu
 
 ---
 
-### 💡 Sonuç ve Mimari Çıkarımlar: "Tekil Hız mı, Yatay Ölçeklenme mi?"
+### 💡 Sonuç ve Mimari Çıkarımlar: Nihai "Trade-off" (Ödünleşim)
+
+Mühendislik dünyasında her şey bir "trade-off" yani takastır. Bu testimiz, Cloud-Native dünyasındaki en net ödünleşimlerden birini gözler önüne seriyor: **Ham İşlemci Hızına Karşılık Kaynak Tasarrufu.**
 
 Eğer testi yaptığımız sunucuda JIT'in hızı sayesinde Spring Boot daha hızlıysa, neden WebAssembly diye bir şey var? Neden bu teknolojiye geleceğin Docker'ı gözüyle bakılıyor?
 
@@ -61,6 +65,8 @@ Cevap bulut mimarisindeki sihirli kelimede gizli: **Scale-out (Yatay Ölçeklenm
 Diyelim ki uygulamanız Black Friday günü bir trafik patlaması yaşadı ve Kubernetes 1.000 yeni Pod açmaya karar verdi:
 - **Spring Boot seçtiyseniz:** 1.000 pod x 130 MB = **130 GB RAM**'e ihtiyacınız var demektir. Sadece bu kapasiteyi karşılamak için on binlerce dolar bulut faturası ödemeniz gerekir. Üstelik her bir JVM'in uyanması 3-5 saniye süreceği için o anki kullanıcılarınız hata sayfalarıyla boğuşacaktır.
 - **Spin (WASM) seçtiyseniz:** 1.000 pod x 1 MB (başlangıç) = **Sadece 1 GB RAM!** Kıyıda köşede kalmış ucuz sunucularda bile devasa bir ordu kurabilirsiniz. Üstelik modüller milisaniyeler içinde ayağa kalktığı için müşteri hiçbir gecikme hissetmez. Trafik bittiğinde ise "Scale to Zero" (sıfıra ölçeklenme) ile RAM tüketimi tekrar 0'a iner.
+
+Buradaki takas çok açıktır: **Java'nın JIT derleyicisi tek bir isteğin işlenmesinde %30-%40 oranında bir hız avantajı sunar.** Ancak bu hız, boştayken bile sistemden çaldığı devasa RAM bloklarının bedelidir. WebAssembly ise bu ufak hız farkından feragat ederek (ki bu fark milisaniyeler seviyesindedir) size %90'a varan bir RAM tasarrufu sunar.
 
 #### Özetle;
 Eğer video işleme, çok ağır saf veri analizi veya kriptografi gibi saatlerce sürecek "tekil" ve donanım sömüren bir işlem yapacaksanız, JIT/AOT derlemeli geleneksel diller (Java, C++, Rust-Native) hala kraldır. 
