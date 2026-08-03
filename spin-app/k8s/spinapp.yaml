@@ -1,0 +1,20 @@
+apiVersion: core.spinoperator.dev/v1alpha1
+kind: SpinApp
+metadata:
+  name: spin-app
+spec:
+  image: "localhost:32000/spin-app:latest"
+  executor: containerd-shim-spin
+  replicas: 1
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: spin-app-service
+spec:
+  type: ClusterIP
+  selector:
+    app: spin-app
+  ports:
+  - port: 80
+    targetPort: 80
