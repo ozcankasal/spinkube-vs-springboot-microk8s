@@ -20,6 +20,7 @@ sudo microk8s helm3 upgrade --install runtime-class-manager --namespace runtime-
 
 echo "Configuring containerd-shim-spin for Runtime Class Manager..."
 sudo microk8s kubectl apply -f https://github.com/spinframework/containerd-shim-spin/releases/download/v0.25.1/runtime-class-manager-shim-v1alpha1-v0.25.1.yaml
+sudo microk8s kubectl label node --all spin=true --overwrite
 
 echo "Installing Spin Operator..."
 sudo microk8s kubectl apply -f https://github.com/spinframework/spin-operator/releases/download/v0.6.1/spin-operator.runtime-class.yaml
